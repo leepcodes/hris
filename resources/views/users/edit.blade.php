@@ -1,0 +1,7 @@
+<x-app-layout><x-slot name="header"><h2 class="font-semibold text-xl text-slate-800">Edit User</h2></x-slot><div class="max-w-3xl mx-auto px-4 py-6"><form method="POST" action="{{ route('users.update',$user) }}" class="space-y-4 bg-white p-6 border rounded">@csrf @method('PUT')
+<label class="block text-sm font-medium">Name</label><input name="name" class="w-full border rounded p-2" value="{{ old('name',$user->name) }}">
+<label class="block text-sm font-medium">Email</label><input name="email" class="w-full border rounded p-2" value="{{ old('email',$user->email) }}">
+<label class="block text-sm font-medium">New Password</label><input type="password" name="password" class="w-full border rounded p-2">
+<label class="block text-sm font-medium">Confirm Password</label><input type="password" name="password_confirmation" class="w-full border rounded p-2">
+<label class="block text-sm font-medium">Roles</label><select name="role_ids[]" multiple class="w-full border rounded p-2">@foreach($roles as $role)<option value="{{ $role->id }}" @selected($user->roles->pluck('id')->contains($role->id))>{{ $role->name }}</option>@endforeach</select>
+<label class="flex items-center gap-2"><input type="checkbox" name="is_active" value="1" @checked($user->is_active)>Active</label><button class="px-3 py-2 bg-slate-900 text-white rounded">Update</button></form></div></x-app-layout>
