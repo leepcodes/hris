@@ -21,13 +21,25 @@ class Employee extends Model
         'middle_name',
         'last_name',
         'suffix_name',
+        'civil_status',
+        'birth_date',
+        'gender',
         'email',
         'mobile_number',
+        'address_line',
+        'city',
+        'province',
+        'zip_code',
+        'emergency_contact_name',
+        'emergency_contact_relationship',
+        'emergency_contact_number',
+        'sss_no',
+        'philhealth_no',
+        'pagibig_no',
+        'tin_no',
         'employment_status',
         'hired_at',
         'basic_salary',
-        'daily_rate',
-        'hourly_rate',
         'is_active',
     ];
 
@@ -35,9 +47,8 @@ class Employee extends Model
     {
         return [
             'hired_at' => 'date',
+            'birth_date' => 'date',
             'basic_salary' => 'decimal:2',
-            'daily_rate' => 'decimal:2',
-            'hourly_rate' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }
@@ -60,5 +71,25 @@ class Employee extends Model
     public function salaryHistories(): HasMany
     {
         return $this->hasMany(SalaryHistory::class);
+    }
+
+    public function dependents(): HasMany
+    {
+        return $this->hasMany(EmployeeDependent::class);
+    }
+
+    public function documents(): HasMany
+    {
+        return $this->hasMany(EmployeeDocument::class);
+    }
+
+    public function educations(): HasMany
+    {
+        return $this->hasMany(EmployeeEducation::class);
+    }
+
+    public function workHistories(): HasMany
+    {
+        return $this->hasMany(EmployeeWorkHistory::class);
     }
 }

@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class LeaveManagementController extends Controller
 {
-    public function __construct(private AuditTrailService $auditTrailService)
-    {
-    }
+    public function __construct(private AuditTrailService $auditTrailService) {}
 
     public function index()
     {

@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\AttendanceRecord;
+use App\Models\Employee;
 use App\Models\EmployeeLoan;
 use App\Models\LeaveCredit;
 use App\Models\LeaveRequest;
@@ -13,7 +14,7 @@ class EssController extends Controller
 {
     public function index()
     {
-        $employee = auth()->user()?->email ? \App\Models\Employee::query()->where('email', auth()->user()->email)->first() : null;
+        $employee = auth()->user()?->email ? Employee::query()->where('email', auth()->user()->email)->first() : null;
 
         return view('ess.index', [
             'employee' => $employee,

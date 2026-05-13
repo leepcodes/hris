@@ -16,8 +16,6 @@ class JobPosition extends Model
         'title',
         'salary_grade',
         'basic_salary',
-        'daily_rate',
-        'hourly_rate',
         'is_active',
     ];
 
@@ -25,8 +23,6 @@ class JobPosition extends Model
     {
         return [
             'basic_salary' => 'decimal:2',
-            'daily_rate' => 'decimal:2',
-            'hourly_rate' => 'decimal:2',
             'is_active' => 'boolean',
         ];
     }

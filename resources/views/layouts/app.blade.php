@@ -31,6 +31,30 @@
             <main>
                 {{ $slot }}
             </main>
+
+            @if (session('status'))
+                <div
+                    x-data="{ show: true }"
+                    x-init="setTimeout(() => show = false, 3500)"
+                    x-show="show"
+                    x-transition
+                    class="fixed top-5 right-5 z-50 max-w-sm rounded-lg border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-800 shadow-lg"
+                >
+                    {{ session('status') }}
+                </div>
+            @endif
+
+            @if ($errors->any())
+                <div
+                    x-data="{ show: true }"
+                    x-init="setTimeout(() => show = false, 4500)"
+                    x-show="show"
+                    x-transition
+                    class="fixed top-5 right-5 z-50 max-w-sm rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800 shadow-lg"
+                >
+                    <p class="font-semibold">Please check the form inputs.</p>
+                </div>
+            @endif
         </div>
     </body>
 </html>

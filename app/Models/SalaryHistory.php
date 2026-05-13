@@ -14,8 +14,6 @@ class SalaryHistory extends Model
         'employee_id',
         'job_position_id',
         'basic_salary',
-        'daily_rate',
-        'hourly_rate',
         'effective_date',
         'reason',
     ];
@@ -24,8 +22,6 @@ class SalaryHistory extends Model
     {
         return [
             'basic_salary' => 'decimal:2',
-            'daily_rate' => 'decimal:2',
-            'hourly_rate' => 'decimal:2',
             'effective_date' => 'date',
         ];
     }

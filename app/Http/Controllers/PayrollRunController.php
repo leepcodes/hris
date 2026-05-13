@@ -12,9 +12,7 @@ use Illuminate\Support\Facades\DB;
 
 class PayrollRunController extends Controller
 {
-    public function __construct(private PayrollService $payrollService)
-    {
-    }
+    public function __construct(private PayrollService $payrollService) {}
 
     public function index()
     {
@@ -40,9 +38,17 @@ class PayrollRunController extends Controller
 
         DB::transaction(function () use ($payrollRun, $status): void {
             $payrollRun->status = $status;
-            if ($status === 'reviewed') { $payrollRun->reviewed_by = auth()->id(); $payrollRun->reviewed_at = now(); }
-            if ($status === 'approved') { $payrollRun->approved_by = auth()->id(); $payrollRun->approved_at = now(); }
-            if ($status === 'released') { $payrollRun->released_at = now(); }
+            if ($status === 'reviewed') {
+                $payrollRun->reviewed_by = auth()->id();
+                $payrollRun->reviewed_at = now();
+            }
+            if ($status === 'approved') {
+                $payrollRun->approved_by = auth()->id();
+                $payrollRun->approved_at = now();
+            }
+            if ($status === 'released') {
+                $payrollRun->released_at = now();
+            }
             $payrollRun->save();
 
             if (in_array($status, ['approved', 'released'], true)) {

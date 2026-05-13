@@ -60,11 +60,13 @@ class AttendanceCsvImportService
 
             if (! $row || blank($row['employee_code']) || blank($row['date'])) {
                 $errors[] = ['row' => $rowNumber, 'message' => 'Employee code and date are required.', 'row_data' => $rawRow];
+
                 continue;
             }
 
             if (! isset($employeeMap[$row['employee_code']])) {
                 $errors[] = ['row' => $rowNumber, 'message' => 'Employee code not found.', 'row_data' => $rawRow];
+
                 continue;
             }
 
@@ -72,6 +74,7 @@ class AttendanceCsvImportService
 
             if (! $date) {
                 $errors[] = ['row' => $rowNumber, 'message' => 'Invalid attendance date.', 'row_data' => $rawRow];
+
                 continue;
             }
 
@@ -98,8 +101,8 @@ class AttendanceCsvImportService
     }
 
     /**
-     * @param array<int, array<string, mixed>> $validRows
-     * @param array<int, array<string, mixed>> $errors
+     * @param  array<int, array<string, mixed>>  $validRows
+     * @param  array<int, array<string, mixed>>  $errors
      */
     public function import(string $filename, int $uploadedBy, array $validRows, array $errors): AttendanceImportBatch
     {

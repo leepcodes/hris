@@ -35,7 +35,9 @@ class PayrollService
                 $unpaidLeaves = LeaveRequest::query()->where('employee_id', $employee->id)->where('status', 'approved')->whereBetween('start_date', [$period->start_date, $period->end_date])->sum('days');
 
                 $basicPay = (float) $employee->basic_salary;
-                $overtimePay = (float) $otHours * (float) $employee->hourly_rate * 1.25;
+                $dailyRate = $basicPay / 22;
+                $hourlyRate = $dailyRate / 8;
+                $overtimePay = (float) $otHours * $hourlyRate * 1.25;
                 $allowances = 0.0;
                 $holidayPay = 0.0;
                 $grossPay = $basicPay + $overtimePay + $allowances + $holidayPay;
@@ -44,10 +46,10 @@ class PayrollService
                 $undertimeMinutes = (int) $attendance->sum('undertime_minutes');
                 $absentDays = (int) $attendance->where('is_absent', true)->count();
 
-                $lateDeduction = ($lateMinutes / 60) * (float) $employee->hourly_rate;
-                $undertimeDeduction = ($undertimeMinutes / 60) * (float) $employee->hourly_rate;
-                $absenceDeduction = (float) $absentDays * (float) $employee->daily_rate;
-                $leaveWithoutPay = (float) $unpaidLeaves * (float) $employee->daily_rate;
+                $lateDeduction = ($lateMinutes / 60) * $hourlyRate;
+                $undertimeDeduction = ($undertimeMinutes / 60) * $hourlyRate;
+                $absenceDeduction = (float) $absentDays * $dailyRate;
+                $leaveWithoutPay = (float) $unpaidLeaves * $dailyRate;
                 $loanDeductions = (float) EmployeeLoan::query()->where('employee_id', $employee->id)->where('status', 'active')->sum('amortization_amount');
 
                 $taxableIncome = max($grossPay - $leaveWithoutPay, 0);

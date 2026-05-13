@@ -19,12 +19,12 @@ class JobPositionSeeder extends Seeder
 
         JobPosition::query()->updateOrCreate(
             ['title' => 'HR Officer'],
-            ['department_id' => $hr->id, 'salary_grade' => 'SG-11', 'basic_salary' => 28000, 'daily_rate' => 1272.73, 'hourly_rate' => 159.09]
+            ['department_id' => $hr->id, 'salary_grade' => 'SG-11', 'basic_salary' => 28000]
         );
 
         JobPosition::query()->updateOrCreate(
             ['title' => 'Payroll Specialist'],
-            ['department_id' => $fin->id, 'salary_grade' => 'SG-12', 'basic_salary' => 32000, 'daily_rate' => 1454.55, 'hourly_rate' => 181.82]
+            ['department_id' => $fin->id, 'salary_grade' => 'SG-12', 'basic_salary' => 32000]
         );
     }
 }
