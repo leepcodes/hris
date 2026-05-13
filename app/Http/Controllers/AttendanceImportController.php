@@ -12,9 +12,7 @@ use Illuminate\View\View;
 
 class AttendanceImportController extends Controller
 {
-    public function __construct(private AttendanceCsvImportService $attendanceCsvImportService)
-    {
-    }
+    public function __construct(private AttendanceCsvImportService $attendanceCsvImportService) {}
 
     public function index(): View
     {

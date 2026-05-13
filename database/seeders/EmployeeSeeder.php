@@ -28,8 +28,6 @@ class EmployeeSeeder extends Seeder
                 'employment_status' => 'active',
                 'hired_at' => now()->toDateString(),
                 'basic_salary' => 35000,
-                'daily_rate' => 1590.91,
-                'hourly_rate' => 198.86,
             ]
         );
     }

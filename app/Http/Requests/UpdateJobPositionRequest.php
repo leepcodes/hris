@@ -18,8 +18,6 @@ class UpdateJobPositionRequest extends FormRequest
             'title' => ['required', 'string', 'max:255'],
             'salary_grade' => ['nullable', 'string', 'max:50'],
             'basic_salary' => ['required', 'numeric', 'min:0'],
-            'daily_rate' => ['required', 'numeric', 'min:0'],
-            'hourly_rate' => ['required', 'numeric', 'min:0'],
             'is_active' => ['nullable', 'boolean'],
         ];
     }

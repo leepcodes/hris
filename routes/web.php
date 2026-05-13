@@ -27,7 +27,16 @@ Route::view('/', 'welcome');
 Route::middleware(['auth', 'verified'])->group(function (): void {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
     Route::resource('users', UserController::class)->except(['show'])->middleware('permission:users.view');
-    Route::resource('employees', EmployeeController::class)->except(['show'])->middleware('permission:employees.view');
+    Route::resource('employees', EmployeeController::class)->middleware('permission:employees.view');
+    Route::post('/employees/{employee}/dependents', [EmployeeController::class, 'addDependent'])->name('employees.dependents.store')->middleware('permission:employees.update');
+    Route::delete('/employees/{employee}/dependents/{dependent}', [EmployeeController::class, 'deleteDependent'])->name('employees.dependents.destroy')->middleware('permission:employees.update');
+    Route::post('/employees/{employee}/educations', [EmployeeController::class, 'addEducation'])->name('employees.educations.store')->middleware('permission:employees.update');
+    Route::delete('/employees/{employee}/educations/{education}', [EmployeeController::class, 'deleteEducation'])->name('employees.educations.destroy')->middleware('permission:employees.update');
+    Route::post('/employees/{employee}/work-histories', [EmployeeController::class, 'addWorkHistory'])->name('employees.work-histories.store')->middleware('permission:employees.update');
+    Route::delete('/employees/{employee}/work-histories/{workHistory}', [EmployeeController::class, 'deleteWorkHistory'])->name('employees.work-histories.destroy')->middleware('permission:employees.update');
+    Route::post('/employees/{employee}/documents', [EmployeeController::class, 'uploadDocument'])->name('employees.documents.store')->middleware('permission:employees.update');
+    Route::delete('/employees/{employee}/documents/{document}', [EmployeeController::class, 'deleteDocument'])->name('employees.documents.destroy')->middleware('permission:employees.update');
+
     Route::resource('departments', DepartmentController::class)->except(['show'])->middleware('permission:departments.view');
     Route::resource('job-positions', JobPositionController::class)->except(['show'])->middleware('permission:job_positions.view');
 
