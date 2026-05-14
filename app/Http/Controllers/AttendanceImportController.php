@@ -17,7 +17,7 @@ class AttendanceImportController extends Controller
     public function index(): View
     {
         abort_unless(request()->user()->hasPermission('attendance.view'), 403);
-
+        
         $batches = AttendanceImportBatch::query()->with('uploader')->latest()->paginate(15);
 
         return view('attendance-imports.index', compact('batches'));
@@ -54,7 +54,7 @@ class AttendanceImportController extends Controller
         ]);
 
         $preview = $request->session()->get('attendance_preview.'.$validated['preview_token']);
-
+          
         if (! $preview) {
             return redirect()->route('attendance-imports.index')->with('status', 'Preview expired. Please upload again.');
         }

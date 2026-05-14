@@ -12,16 +12,14 @@ class AttendanceRecord extends Model
 
     protected $fillable = [
         'attendance_import_batch_id',
-        'employee_id',
-        'employee_code',
-        'attendance_date',
-        'time_in',
-        'time_out',
-        'break_hours',
-        'late_minutes',
-        'undertime_minutes',
-        'is_absent',
-        'overtime_hours',
+        'department',
+        'name',
+        'employee_no',
+        'date_time',
+        'status',
+        'location',
+        'id_number',
+        'verification_code',
     ];
 
     protected function casts(): array

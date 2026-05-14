@@ -26,26 +26,30 @@
             <table class="min-w-full text-sm">
                 <thead>
                     <tr class="border-b">
-                        <th class="p-3 text-left">Employee Code</th>
-                        <th class="text-left">Date</th>
-                        <th class="text-left">Time In</th>
-                        <th class="text-left">Time Out</th>
-                        <th class="text-left">Late</th>
-                        <th class="text-left">OT</th>
+                        <th class="p-3 text-left">No.</th>
+                        <th class="text-left">Name</th>
+                        <th class="text-left">Department</th>
+                        <th class="text-left">Date/Time</th>
+                        <th class="text-left">Status</th>
+                        <th class="text-left">Location</th>
+                        <th class="text-left">ID Number</th>
+                        <th class="text-left">Verify Code</th>
                     </tr>
                 </thead>
                 <tbody>
                     @forelse($validRows as $row)
                         <tr class="border-b">
-                            <td class="p-3">{{ $row['employee_code'] }}</td>
-                            <td>{{ $row['attendance_date'] }}</td>
-                            <td>{{ $row['time_in'] }}</td>
-                            <td>{{ $row['time_out'] }}</td>
-                            <td>{{ $row['late_minutes'] }}</td>
-                            <td>{{ $row['overtime_hours'] }}</td>
+                            <td class="p-3">{{ $row['employee_no'] }}</td>
+                            <td>{{ $row['name'] }}</td>
+                            <td>{{ $row['department'] }}</td>
+                            <td>{{ $row['date_time'] }}</td>
+                            <td>{{ $row['status'] }}</td>
+                            <td>{{ $row['location'] }}</td>
+                            <td>{{ $row['id_number'] }}</td>
+                            <td>{{ $row['verification_code'] }}</td>
                         </tr>
                     @empty
-                        <tr><td colspan="6" class="p-4 text-slate-500">No valid rows found.</td></tr>
+                        <tr><td colspan="8" class="p-4 text-slate-500">No valid rows found.</td></tr>
                     @endforelse
                 </tbody>
             </table>

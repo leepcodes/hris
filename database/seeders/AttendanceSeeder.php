@@ -18,7 +18,7 @@ class AttendanceSeeder extends Seeder
             return;
         }
 
-        $employees = Employee::query()->orderBy('id')->limit(5)->get();
+       $employees = Employee::query()->with('department')->orderBy('id')->limit(5)->get();
 
         if ($employees->isEmpty()) {
             return;
@@ -55,16 +55,14 @@ class AttendanceSeeder extends Seeder
 
                     AttendanceRecord::query()->create([
                         'attendance_import_batch_id' => $batch->id,
-                        'employee_id' => $employee->id,
-                        'employee_code' => $employee->employee_code,
-                        'attendance_date' => $date,
-                        'time_in' => '08:00:00',
-                        'time_out' => '17:00:00',
-                        'break_hours' => 1,
-                        'late_minutes' => $day % 7 === 0 ? 15 : 0,
-                        'undertime_minutes' => 0,
-                        'is_absent' => false,
-                        'overtime_hours' => $day % 10 === 0 ? 2 : 0,
+                        'department'                 => $employee->department->name ?? 'N/A',  
+                        'name' => trim($employee->first_name.' '.$employee->last_name),                       
+                        'employee_no'                => $employee->employee_code,
+                        'date_time'                  => $date.' 08:00:00',
+                        'status'                     => 'C/In',
+                        'location'                   => '1',
+                        'id_number'                  => $employee->employee_code,
+                        'verification_code'          => 'Fingerprint',
                     ]);
                 }
             }

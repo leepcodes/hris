@@ -21,18 +21,18 @@ class AttendanceCsvImportService
             return ['headers' => [], 'valid_rows' => [], 'errors' => [['row' => 0, 'message' => 'CSV is empty.']], 'total_rows' => 0];
         }
 
-        $headers = array_map(fn ($value) => strtolower(trim((string) $value)), array_shift($rows));
-
+        $rawHeaders = array_shift($rows);
+        $headers = array_map(fn ($value) => $this->normalizeHeader((string) $value), $rawHeaders);
+        // dd($headers);
         $requiredHeaders = [
-            'employee_code',
-            'date',
-            'time_in',
-            'time_out',
-            'break_hours',
-            'late_minutes',
-            'undertime_minutes',
-            'absences',
-            'overtime_hours',
+            'department',
+            'name',
+            'no',
+            'date_time',
+            'status',
+            'location',       
+            'id_number',
+            'verification_code', 
         ];
 
         $missingHeaders = array_values(array_diff($requiredHeaders, $headers));
@@ -41,14 +41,13 @@ class AttendanceCsvImportService
             return [
                 'headers' => $headers,
                 'valid_rows' => [],
-                'errors' => [['row' => 0, 'message' => 'Missing required headers: '.implode(', ', $missingHeaders)]],
+                'errors' => [['row' => 0, 'message' => 'Missing required headers: ' . implode(', ', $missingHeaders)]],
                 'total_rows' => count($rows),
             ];
         }
 
         $validRows = [];
         $errors = [];
-        $employeeMap = Employee::query()->pluck('id', 'employee_code')->toArray();
 
         foreach ($rows as $index => $rawRow) {
             if ($rawRow === [] || (count($rawRow) === 1 && trim((string) $rawRow[0]) === '')) {
@@ -58,44 +57,27 @@ class AttendanceCsvImportService
             $rowNumber = $index + 2;
             $row = array_combine($headers, array_pad($rawRow, count($headers), null));
 
-            if (! $row || blank($row['employee_code']) || blank($row['date'])) {
-                $errors[] = ['row' => $rowNumber, 'message' => 'Employee code and date are required.', 'row_data' => $rawRow];
-
-                continue;
-            }
-
-            if (! isset($employeeMap[$row['employee_code']])) {
-                $errors[] = ['row' => $rowNumber, 'message' => 'Employee code not found.', 'row_data' => $rawRow];
-
-                continue;
-            }
-
-            $date = date_create((string) $row['date']);
-
-            if (! $date) {
-                $errors[] = ['row' => $rowNumber, 'message' => 'Invalid attendance date.', 'row_data' => $rawRow];
-
+            if (! $row || blank($row['no']) || blank($row['name'])) {
+                $errors[] = ['row' => $rowNumber, 'message' => 'No and Name are required.', 'row_data' => $rawRow];
                 continue;
             }
 
             $validRows[] = [
-                'employee_id' => $employeeMap[$row['employee_code']],
-                'employee_code' => trim((string) $row['employee_code']),
-                'attendance_date' => $date->format('Y-m-d'),
-                'time_in' => $this->normalizeTime($row['time_in']),
-                'time_out' => $this->normalizeTime($row['time_out']),
-                'break_hours' => (float) ($row['break_hours'] ?: 0),
-                'late_minutes' => (int) ($row['late_minutes'] ?: 0),
-                'undertime_minutes' => (int) ($row['undertime_minutes'] ?: 0),
-                'is_absent' => (int) ($row['absences'] ?: 0) > 0,
-                'overtime_hours' => (float) ($row['overtime_hours'] ?: 0),
+                'department'        => trim((string) $row['department']),
+                'name'              => trim((string) $row['name']),
+                'employee_no'       => trim((string) $row['no']),
+                'date_time'         => trim((string) ($row['date_time'] ?? '')),
+                'status'            => trim((string) ($row['status'] ?? '')),
+                'location'          => trim((string) ($row['location'] ?? '')),   // came from location_id
+                'id_number'         => trim((string) ($row['id_number'] ?? '')),
+                'verification_code' => trim((string) ($row['verification_code'] ?? '')),
             ];
         }
 
         return [
-            'headers' => $headers,
+            'headers'    => $headers,
             'valid_rows' => $validRows,
-            'errors' => $errors,
+            'errors'     => $errors,
             'total_rows' => count($rows),
         ];
     }
@@ -108,20 +90,27 @@ class AttendanceCsvImportService
     {
         return DB::transaction(function () use ($filename, $uploadedBy, $validRows, $errors): AttendanceImportBatch {
             $batch = AttendanceImportBatch::query()->create([
-                'filename' => $filename,
+                'filename'    => $filename,
                 'uploaded_by' => $uploadedBy,
-                'status' => 'imported',
-                'total_rows' => count($validRows) + count($errors),
-                'valid_rows' => count($validRows),
+                'status'      => 'imported',
+                'total_rows'  => count($validRows) + count($errors),
+                'valid_rows'  => count($validRows),
                 'invalid_rows' => count($errors),
-                'row_errors' => $errors,
+                'row_errors'  => $errors,
                 'imported_at' => now(),
             ]);
-
-            foreach ($validRows as $row) {
+            // dd($validRows[0] ?? 'empty');
+           foreach ($validRows as $row) {
                 AttendanceRecord::query()->create([
                     'attendance_import_batch_id' => $batch->id,
-                    ...$row,
+                    'employee_no'              => $row['employee_no'],  
+                    'department'                 => $row['department'],
+                    'name'                       => $row['name'],
+                    'date_time'                  => $row['date_time'],
+                    'status'                     => $row['status'],
+                    'location'                   => $row['location'],
+                    'id_number'                  => $row['id_number'],
+                    'verification_code'          => $row['verification_code'],
                 ]);
             }
 
@@ -129,18 +118,30 @@ class AttendanceCsvImportService
         });
     }
 
-    private function normalizeTime(mixed $value): ?string
+    
+    private function normalizeHeader(string $header): string
     {
-        if (blank($value)) {
-            return null;
+        $header = preg_replace('/[\x00-\x1F\x80-\xFF]/', '', $header);
+        $header = trim((string) $header);
+
+        $map = [
+            'Date/Time'   => 'date_time',
+            'ID Number'   => 'id_number',
+            'Location ID' => 'location',
+            'VerifyCode'  => 'verification_code',
+            'No.'         => 'no',
+        ];
+
+        foreach ($map as $raw => $normalized) {
+            if (strcasecmp($header, $raw) === 0) {
+                return $normalized;
+            }
         }
 
-        $timestamp = strtotime((string) $value);
+        $header = preg_replace('/[^a-zA-Z0-9]+/', ' ', $header);
+        $header = trim((string) $header);
+        $header = preg_replace('/\s+/', '_', $header);
 
-        if ($timestamp === false) {
-            return null;
-        }
-
-        return date('H:i:s', $timestamp);
+        return strtolower((string) $header);
     }
 }
