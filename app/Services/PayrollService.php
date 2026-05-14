@@ -30,10 +30,10 @@ class PayrollService
             $isSecondCutoff = (int) $period->start_date->format('d') >= 16 || (int) $period->end_date->format('d') >= 30;
 
             foreach ($employees as $employee) {
-                $attendance = AttendanceRecord::query()->where('employee_id', $employee->id)->whereBetween('attendance_date', [$period->start_date, $period->end_date])->get();
+                $attendance = collect(); // TODO: reimplement when attendance processing is ready
                 $otHours = OvertimeRequest::query()->where('employee_id', $employee->id)->where('status', 'approved')->whereBetween('ot_date', [$period->start_date, $period->end_date])->sum('hours');
                 $unpaidLeaves = LeaveRequest::query()->where('employee_id', $employee->id)->where('status', 'approved')->whereBetween('start_date', [$period->start_date, $period->end_date])->sum('days');
-
+            
                 $basicPay = (float) $employee->basic_salary;
                 $dailyRate = $basicPay / 22;
                 $hourlyRate = $dailyRate / 8;
@@ -41,16 +41,16 @@ class PayrollService
                 $allowances = 0.0;
                 $holidayPay = 0.0;
                 $grossPay = $basicPay + $overtimePay + $allowances + $holidayPay;
-
-                $lateMinutes = (int) $attendance->sum('late_minutes');
-                $undertimeMinutes = (int) $attendance->sum('undertime_minutes');
-                $absentDays = (int) $attendance->where('is_absent', true)->count();
-
-                $lateDeduction = ($lateMinutes / 60) * $hourlyRate;
-                $undertimeDeduction = ($undertimeMinutes / 60) * $hourlyRate;
-                $absenceDeduction = (float) $absentDays * $dailyRate;
+            
+                $lateMinutes = 0;
+                $undertimeMinutes = 0;
+                $absentDays = 0;
+                $lateDeduction = 0.0;
+                $undertimeDeduction = 0.0;
+                $absenceDeduction = 0.0;
                 $leaveWithoutPay = (float) $unpaidLeaves * $dailyRate;
                 $loanDeductions = (float) EmployeeLoan::query()->where('employee_id', $employee->id)->where('status', 'active')->sum('amortization_amount');
+    
 
                 $taxableIncome = max($grossPay - $leaveWithoutPay, 0);
 
